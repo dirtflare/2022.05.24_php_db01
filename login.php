@@ -1,5 +1,6 @@
 <?php
-require_once('config.php');
+// require_once('config.php');
+include('function.php');
 session_start();
 // var_dump($_POST);
 // exit();
@@ -12,9 +13,10 @@ return false;
 //ログイン処理を作る
 try{
 //PDOとは (PHP_Data_ObjectでDB接続を簡単にしてくれる)
-$pdo = new PDO(DSN, DB_USER, DB_PASS);
+// $pdo = new PDO(DSN, DB_USER, DB_PASS);
+$pdo = connect_to_db();
 //emailとpasswordが一致するときは1を返し、一致しないときは0を返すsqlを作成
-$sql = "Select * from user where email = :email and password = :password";
+$sql = "Select * from users_table where email = :email and password = :password";
 $stmt = $pdo->prepare($sql);
 //POST値をsq1に代入
 $stmt->bindParam(":email", $_POST['email']);
@@ -36,6 +38,10 @@ $result = true;
 header("Location:management.php");
 //(ユーザー）成功した場合は以下のページに移動
 }else if($cnt&&$cnt['is_admin'] == 0){
+    $_SESSION =  array();
+    $_SESSION['is_admin']=$cnt['is_admin'];
+    $_SESSION['user_id'] = $cnt['id'];
+    $_SESSION['session_id'] = session_id();
     $_SESSION['EMAIL'] = $_POST['email'];
     echo 'ログイン成功';
     $result = true;
